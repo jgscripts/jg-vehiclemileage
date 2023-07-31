@@ -39,7 +39,7 @@ function distanceCheck()
         currentVehOwned = false
         return
       end
-      print('resetting vals')
+
       currentVehOwned = true
       currentVehPlate = plate
       currentVehMileage = data.mileage

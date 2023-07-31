@@ -17,6 +17,5 @@ createCallback('jg-vehiclemileage:server:get-mileage', function(src, cb, plate)
 end)
 
 RegisterNetEvent('jg-vehiclemileage:server:update-mileage', function(plate, mileage)
-  print(mileage, plate)
   MySQL.update("UPDATE " .. Framework.VehiclesTable .. " SET mileage = ? WHERE plate = ?", {mileage, plate})
 end)
