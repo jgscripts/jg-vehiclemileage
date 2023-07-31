@@ -1,0 +1,35 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Roboto Mono", monospace;
+  background: none;
+}
+
+.odometer {
+  display: none;
+  gap: 7.5px;
+  align-items: center;
+  position: absolute;
+  background: #212529;
+  border: 1px solid #42484e;
+  padding: 5px 8px;
+  border-radius: 7px;
+  color: white;
+  right: 25px;
+  bottom: 25px;
+  transition: 0.5s ease-in-out;
+  user-select: none;
+}
+
+.odometer-value {
+  font-size: 20px;
+}
+
+.odometer-unit {
+  color: #999;
+}
