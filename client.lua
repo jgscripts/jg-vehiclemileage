@@ -4,7 +4,7 @@ local currentVehPlate = ""
 local currentVehOwned = false
 local lastUpdatedMileage = nil
 
-function triggerCallback(cbRef, cb, ...)
+local function triggerCallback(cbRef, cb, ...)
   if Config.Framework == "QBCore" then
     return QBCore.Functions.TriggerCallback(cbRef, function(res)
       cb(res)
@@ -16,22 +16,31 @@ function triggerCallback(cbRef, cb, ...)
   end
 end
 
-function getVehicleCoords()
-  return GetEntityCoords(GetVehiclePedIsIn(PlayerPedId()))
-end
+local function distanceCheck()
+  local ped = PlayerPedId()
 
-function distanceCheck()
   if not IsPedInAnyVehicle(PlayerPedId()) then
     SendNUIMessage({ type = "hide" })
     return
   end
 
+  local vehicle = GetVehiclePedIsIn(PlayerPedId())
+  local vehClass = GetVehicleClass(vehicle)
+
+  if GetPedInVehicleSeat(vehicle, -1) ~= ped or vehClass == 13 or vehClass == 14 or vehClass == 15 or vehClass == 16 or vehClass == 17 or vehClass == 21 then
+    SendNUIMessage({ type = "hide" })
+    return
+  end
+
   if not lastLocation then
-    lastLocation = getVehicleCoords()
+    lastLocation = GetEntityCoords(vehicle)
   end
 
   local plate = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId()))
-  if plate == currentVehPlate and not currentVehOwned then return end
+
+  if plate == currentVehPlate and not currentVehOwned then
+    return
+  end
 
   if not currentVehPlate or plate ~= currentVehPlate then
     triggerCallback('jg-vehiclemileage:server:get-mileage', function(data)
@@ -47,15 +56,18 @@ function distanceCheck()
     return
   end
 
-  local dist = #(lastLocation - getVehicleCoords())
+  local dist = 0
+  if IsVehicleOnAllWheels(vehicle) then
+    dist = #(lastLocation - GetEntityCoords(vehicle))
+  end
+
   local distKm = dist / 1000
-
   currentVehMileage = currentVehMileage + distKm
-  lastLocation = getVehicleCoords()
-
+  lastLocation = GetEntityCoords(vehicle)
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
-  SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
+
   if roundedMileage ~= lastUpdatedMileage then
+    SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
     TriggerServerEvent('jg-vehiclemileage:server:update-mileage', currentVehPlate, roundedMileage)
     lastUpdatedMileage = roundedMileage
   end

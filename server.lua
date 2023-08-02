@@ -1,4 +1,4 @@
-function createCallback(cbRef, cb)
+local function createCallback(cbRef, cb)
   if Config.Framework == "QBCore" then
     return QBCore.Functions.CreateCallback(cbRef, function(...)
       cb(...)
