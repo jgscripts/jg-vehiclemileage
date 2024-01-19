@@ -16,6 +16,8 @@ local function triggerCallback(cbRef, cb, ...)
   end
 end
 
+
+
 local function distanceCheck()
   local ped = PlayerPedId()
 
@@ -36,7 +38,7 @@ local function distanceCheck()
     lastLocation = GetEntityCoords(vehicle)
   end
 
-  local plate = GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId()))
+  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId())), '^%s*(.-)%s*$', '%1')
 
   if plate == currentVehPlate and not currentVehOwned then
     return
