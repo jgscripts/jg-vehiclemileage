@@ -44,8 +44,6 @@ local function distanceCheck()
     return
   end
 
-  print(currentVehPlate, currentVehOwned)
-
   if not currentVehPlate or plate ~= currentVehPlate then
     triggerCallback('jg-vehiclemileage:server:get-mileage', function(data)
       if data.error then
