@@ -82,5 +82,3 @@ Citizen.CreateThread(function()
     Wait(1000)
   end
 end)
-
-exports("GetUnit", function() return Config.Unit end)
