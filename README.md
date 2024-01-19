@@ -10,6 +10,11 @@ A simple script for QBCore & ESX to show your vehicle's mileage in-game. When dr
 2. Ensure the script in your server.cfg, by adding `ensure jg-vehiclemileage`. Make sure the script is ensured _after_ your `qb-core` or `es_extended` resource
 3. Run either the QBCore or ESX line of SQL in `run.sql` within your database
 
+## Dependencies
+
+- QBCore or ESX Legacy 1.3+
+- [oxmysql](https://github.com/overextended/oxmysql)
+
 ## Exports
 
 Use `GetMileage(plate)` to get the mileage of a vehicle. Returns
@@ -27,4 +32,4 @@ _Will return `false` if the plate does not exist in the database_
 
 ## Our other work
 
-Want to see your vehicle's mileage in your garage? Try our Advanced Garages script: https://jgscripts.com/scripts/advanced-garages
+Want to see your vehicle's mileage in your garage with no setup? Try our Advanced Garages script: https://jgscripts.com/scripts/advanced-garages
