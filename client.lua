@@ -1,6 +1,7 @@
 local lastLocation = nil
 local currentVehMileage = 0
 local currentVehPlate = ""
+local recheckCurrentVeh = 10000
 local currentVehOwned = false
 local lastUpdatedMileage = nil
 
@@ -16,17 +17,15 @@ local function triggerCallback(cbRef, cb, ...)
   end
 end
 
-
-
 local function distanceCheck()
   local ped = PlayerPedId()
 
-  if not IsPedInAnyVehicle(PlayerPedId()) then
+  if not IsPedInAnyVehicle(PlayerPedId(), false) then
     SendNUIMessage({ type = "hide" })
     return
   end
 
-  local vehicle = GetVehiclePedIsIn(PlayerPedId())
+  local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
   local vehClass = GetVehicleClass(vehicle)
 
   if GetPedInVehicleSeat(vehicle, -1) ~= ped or vehClass == 13 or vehClass == 14 or vehClass == 15 or vehClass == 16 or vehClass == 17 or vehClass == 21 then
@@ -38,13 +37,16 @@ local function distanceCheck()
     lastLocation = GetEntityCoords(vehicle)
   end
 
-  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId())), '^%s*(.-)%s*$', '%1')
+  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false)), '^%s*(.-)%s*$', '%1')
 
-  if plate == currentVehPlate and not currentVehOwned then
+  if plate == currentVehPlate and not currentVehOwned and recheckCurrentVeh > 0 then
+    recheckCurrentVeh -= 1000
     return
   end
 
-  if not currentVehPlate or plate ~= currentVehPlate then
+  if not currentVehPlate or plate ~= currentVehPlate or recheckCurrentVeh <= 0 then
+    recheckCurrentVeh = 10000
+
     triggerCallback('jg-vehiclemileage:server:get-mileage', function(data)
       if data.error then
         currentVehOwned = false
@@ -70,6 +72,7 @@ local function distanceCheck()
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
 
   if roundedMileage ~= lastUpdatedMileage then
+    Entity(vehicle).state:set("vehicleMileage", roundedMileage, true)
     SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
     TriggerServerEvent('jg-vehiclemileage:server:update-mileage', currentVehPlate, roundedMileage)
     lastUpdatedMileage = roundedMileage
