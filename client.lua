@@ -72,7 +72,7 @@ local function distanceCheck()
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
 
   if roundedMileage ~= lastUpdatedMileage then
-    Entity(vehicle).state:set("vehicleMileage", roundedMileage, true)
+    Entity(vehicle).state:set("vehicleMileage", roundedMileage)
     SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
     TriggerServerEvent('jg-vehiclemileage:server:update-mileage', currentVehPlate, roundedMileage)
     lastUpdatedMileage = roundedMileage
