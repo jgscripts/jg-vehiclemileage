@@ -5,18 +5,6 @@ local recheckCurrentVeh = 10000
 local currentVehOwned = false
 local lastUpdatedMileage = nil
 
-local function triggerCallback(cbRef, cb, ...)
-  if Config.Framework == "QBCore" then
-    return QBCore.Functions.TriggerCallback(cbRef, function(res)
-      cb(res)
-    end, ...)
-  elseif Config.Framework == "ESX" then
-    return ESX.TriggerServerCallback(cbRef, function(res)
-      cb(res)
-    end, ...)
-  end
-end
-
 local function distanceCheck()
   local ped = PlayerPedId()
 
@@ -47,24 +35,23 @@ local function distanceCheck()
   if not currentVehPlate or plate ~= currentVehPlate or recheckCurrentVeh <= 0 then
     recheckCurrentVeh = 10000
 
-    triggerCallback('jg-vehiclemileage:server:get-mileage', function(data)
-      if data.error then
-        currentVehOwned = false
-        currentVehPlate = plate
-        return
-      end
-
-      currentVehOwned = true
+    local data = lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
+    if data.error then
+      currentVehOwned = false
       currentVehPlate = plate
-      currentVehMileage = data.mileage
-    end, plate)
+      return
+    end
+
+    currentVehOwned = true
+    currentVehPlate = plate
+    currentVehMileage = data.mileage
     return
   end
 
   SendNUIMessage({ type = "show", value = currentVehMileage, unit = Config.Unit })
 
   local dist = 0
-  if IsVehicleOnAllWheels(vehicle) then
+  if IsVehicleOnAllWheels(vehicle) and not IsEntityInWater(vehicle) then
     dist = #(lastLocation - GetEntityCoords(vehicle))
   end
 
@@ -81,7 +68,7 @@ local function distanceCheck()
   end
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
   while true do
     distanceCheck()
     Wait(1000)
