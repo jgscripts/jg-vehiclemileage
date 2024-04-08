@@ -1,32 +1,19 @@
 local lastLocation = nil
 local currentVehMileage = 0
 local currentVehPlate = ""
+local recheckCurrentVeh = 10000
 local currentVehOwned = false
 local lastUpdatedMileage = nil
-
-local function triggerCallback(cbRef, cb, ...)
-  if Config.Framework == "QBCore" then
-    return QBCore.Functions.TriggerCallback(cbRef, function(res)
-      cb(res)
-    end, ...)
-  elseif Config.Framework == "ESX" then
-    return ESX.TriggerServerCallback(cbRef, function(res)
-      cb(res)
-    end, ...)
-  end
-end
-
-
 
 local function distanceCheck()
   local ped = PlayerPedId()
 
-  if not IsPedInAnyVehicle(PlayerPedId()) then
+  if not IsPedInAnyVehicle(PlayerPedId(), false) then
     SendNUIMessage({ type = "hide" })
     return
   end
 
-  local vehicle = GetVehiclePedIsIn(PlayerPedId())
+  local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
   local vehClass = GetVehicleClass(vehicle)
 
   if GetPedInVehicleSeat(vehicle, -1) ~= ped or vehClass == 13 or vehClass == 14 or vehClass == 15 or vehClass == 16 or vehClass == 17 or vehClass == 21 then
@@ -38,29 +25,33 @@ local function distanceCheck()
     lastLocation = GetEntityCoords(vehicle)
   end
 
-  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId())), '^%s*(.-)%s*$', '%1')
+  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false)), '^%s*(.-)%s*$', '%1')
 
-  if plate == currentVehPlate and not currentVehOwned then
+  if plate == currentVehPlate and not currentVehOwned and recheckCurrentVeh > 0 then
+    recheckCurrentVeh -= 1000
     return
   end
 
-  if not currentVehPlate or plate ~= currentVehPlate then
-    triggerCallback('jg-vehiclemileage:server:get-mileage', function(data)
-      if data.error then
-        currentVehOwned = false
-        currentVehPlate = plate
-        return
-      end
+  if not currentVehPlate or plate ~= currentVehPlate or recheckCurrentVeh <= 0 then
+    recheckCurrentVeh = 10000
 
-      currentVehOwned = true
+    local data = lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
+    if data.error then
+      currentVehOwned = false
       currentVehPlate = plate
-      currentVehMileage = data.mileage
-    end, plate)
+      return
+    end
+
+    currentVehOwned = true
+    currentVehPlate = plate
+    currentVehMileage = data.mileage
     return
   end
+
+  SendNUIMessage({ type = "show", value = currentVehMileage, unit = Config.Unit })
 
   local dist = 0
-  if IsVehicleOnAllWheels(vehicle) then
+  if IsVehicleOnAllWheels(vehicle) and not IsEntityInWater(vehicle) then
     dist = #(lastLocation - GetEntityCoords(vehicle))
   end
 
@@ -68,15 +59,16 @@ local function distanceCheck()
   currentVehMileage = currentVehMileage + distKm
   lastLocation = GetEntityCoords(vehicle)
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
+  SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
 
   if roundedMileage ~= lastUpdatedMileage then
-    SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
+    Entity(vehicle).state:set("vehicleMileage", roundedMileage)
     TriggerServerEvent('jg-vehiclemileage:server:update-mileage', currentVehPlate, roundedMileage)
     lastUpdatedMileage = roundedMileage
   end
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
   while true do
     distanceCheck()
     Wait(1000)
