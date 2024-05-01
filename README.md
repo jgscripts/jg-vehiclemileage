@@ -1,18 +1,18 @@
-# JG Scripts Vehicle Mileage (QB/ESX)
+# JG Scripts Vehicle Mileage (QB/QBox/ESX)
 
 <img src="https://github.com/jgscripts/jg-vehiclemileage/assets/3826279/a774d098-05ae-4d05-b167-f4c990d1f0b8" alt="vehicle-mileage" style="width:200px;"/>
 
-A simple script for QBCore & ESX to show your vehicle's mileage in-game. When driving a vehicle that is owned (stored in the database), you will see an odometer in the bottom right of your screen. You can configure it to use miles or kilometers.
+A simple script for QBCore, QBox & ESX to show your vehicle's mileage in-game. When driving a vehicle that is owned (stored in the database), you will see an odometer in the bottom right of your screen. You can configure it to use miles or kilometers.
 
 ## Installation
 
 1. Download the zip, and move into your resources folder
-2. Ensure the script in your server.cfg, by adding `ensure jg-vehiclemileage`. Make sure the script is ensured _after_ your `qb-core` or `es_extended` resource
-3. Run either the QBCore or ESX line of SQL in `run.sql` within your database
+2. Ensure the script in your server.cfg, by adding `ensure jg-vehiclemileage`. Make sure the script is ensured _after_ your `qb-core`, `qbx_core` or `es_extended` resource
+3. Run either the QBCore/QBox or ESX line of SQL in `run.sql` within your database
 
 ## Dependencies
 
-- QBCore/ESX (or pretty easy to use a custom framework)
+- QBCore/QBox/ESX (or pretty easy to use a custom framework)
 - [ox_lib](https://github.com/overextended/ox_lib)
 - [oxmysql](https://github.com/overextended/oxmysql)
 
