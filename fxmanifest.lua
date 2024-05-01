@@ -4,7 +4,7 @@ lua54 "yes"
 
 author "JG Scripts"
 description "Tracks vehicle mileage with UI"
-version "1.1.0"
+version "v1.1.1"
 
 client_script "client.lua"
 
