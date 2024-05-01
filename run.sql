@@ -1,4 +1,4 @@
--- QBCore
+-- QBCore / QBox
 ALTER TABLE player_vehicles ADD mileage FLOAT DEFAULT 0 NOT NULL
 
 -- ESX

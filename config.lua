@@ -1,3 +1,3 @@
 Config = {}
-Config.Framework = "QBCore"
+Config.Framework = "auto" -- or "QBCore", "Qbox", "ESX"
 Config.Unit = "miles" -- or "kilometers"
