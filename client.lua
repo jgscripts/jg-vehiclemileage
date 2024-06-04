@@ -10,7 +10,7 @@ local function distanceCheck()
   local ped = PlayerPedId()
 
   if not IsPedInAnyVehicle(PlayerPedId(), false) then
-    SendNUIMessage({ type = "hide" })
+    sendToNui({ type = "hide" })
     return
   end
 
@@ -18,7 +18,7 @@ local function distanceCheck()
   local vehClass = GetVehicleClass(vehicle)
 
   if GetPedInVehicleSeat(vehicle, -1) ~= ped or vehClass == 13 or vehClass == 14 or vehClass == 15 or vehClass == 16 or vehClass == 17 or vehClass == 21 then
-    SendNUIMessage({ type = "hide" })
+    sendToNui({ type = "hide" })
     return
   end
 
@@ -49,7 +49,7 @@ local function distanceCheck()
     return
   end
 
-  SendNUIMessage({ type = "show", value = currentVehMileage, unit = Config.Unit, position = Position })
+  sendToNui({ type = "show", value = currentVehMileage, unit = Config.Unit, position = Position })
 
   local dist = 0
   if IsVehicleOnAllWheels(vehicle) and not IsEntityInWater(vehicle) then
@@ -60,7 +60,7 @@ local function distanceCheck()
   currentVehMileage = currentVehMileage + distKm
   lastLocation = GetEntityCoords(vehicle)
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
-  SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit, position = Position })
+  sendToNui({ type = "show", value = roundedMileage, unit = Config.Unit, position = Position })
 
   if roundedMileage ~= lastUpdatedMileage then
     Entity(vehicle).state:set("vehicleMileage", roundedMileage)
@@ -75,5 +75,11 @@ CreateThread(function()
     Wait(1000)
   end
 end)
+
+function sendToNui(data)
+  if Config.ShowMileage then
+    SendNUIMessage(data)
+  end
+end
 
 exports("GetUnit", function() return Config.Unit end)
