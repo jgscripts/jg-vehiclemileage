@@ -4,6 +4,7 @@ local currentVehPlate = ""
 local recheckCurrentVeh = 10000
 local currentVehOwned = false
 local lastUpdatedMileage = nil
+local Position = Config.Position
 
 local function distanceCheck()
   local ped = PlayerPedId()
@@ -48,7 +49,7 @@ local function distanceCheck()
     return
   end
 
-  SendNUIMessage({ type = "show", value = currentVehMileage, unit = Config.Unit })
+  SendNUIMessage({ type = "show", value = currentVehMileage, unit = Config.Unit, position = Position })
 
   local dist = 0
   if IsVehicleOnAllWheels(vehicle) and not IsEntityInWater(vehicle) then
@@ -59,7 +60,7 @@ local function distanceCheck()
   currentVehMileage = currentVehMileage + distKm
   lastLocation = GetEntityCoords(vehicle)
   local roundedMileage = tonumber(string.format("%.1f", currentVehMileage))
-  SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit })
+  SendNUIMessage({ type = "show", value = roundedMileage, unit = Config.Unit, position = Position })
 
   if roundedMileage ~= lastUpdatedMileage then
     Entity(vehicle).state:set("vehicleMileage", roundedMileage)
