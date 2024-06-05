@@ -13,6 +13,7 @@ body {
 .odometer {
   display: none;
   gap: 7.5px;
+  margin: 2rem;
   align-items: center;
   position: absolute;
   background: #212529;
@@ -20,8 +21,6 @@ body {
   padding: 5px 8px;
   border-radius: 7px;
   color: white;
-  right: 25px;
-  bottom: 25px;
   transition: 0.5s ease-in-out;
   user-select: none;
 }
