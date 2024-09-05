@@ -26,7 +26,7 @@ local function distanceCheck()
     lastLocation = GetEntityCoords(vehicle)
   end
 
-  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false)), '^%s*(.-)%s*$', '%1')
+  local plate = string.gsub(GetVehicleNumberPlateText(GetVehiclePedIsIn(PlayerPedId(), false)), "^%s*(.-)%s*$", "%1")
 
   if plate == currentVehPlate and not currentVehOwned and recheckCurrentVeh > 0 then
     recheckCurrentVeh -= 1000
@@ -64,12 +64,14 @@ local function distanceCheck()
 
   if roundedMileage ~= lastUpdatedMileage then
     Entity(vehicle).state:set("vehicleMileage", roundedMileage)
-    TriggerServerEvent('jg-vehiclemileage:server:update-mileage', currentVehPlate, roundedMileage)
+    TriggerServerEvent("jg-vehiclemileage:server:update-mileage", currentVehPlate, roundedMileage)
     lastUpdatedMileage = roundedMileage
   end
 end
 
 CreateThread(function()
+  Wait(2000)
+
   while true do
     distanceCheck()
     Wait(1000)

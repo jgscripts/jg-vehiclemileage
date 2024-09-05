@@ -1,4 +1,6 @@
 Config = {}
+Config.AutoRunSQL = true
+
 Config.Framework = "auto" -- or "QBCore", "Qbox", "ESX"
 Config.ShowMileage = true
 Config.Unit = "miles" -- "miles" or "kilometers"

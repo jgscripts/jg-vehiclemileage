@@ -4,9 +4,7 @@ lua54 "yes"
 
 author "JG Scripts"
 description "Tracks vehicle mileage with UI"
-version "v1.1.1"
-
-client_script "client.lua"
+version "v1.2"
 
 shared_scripts {
   "@ox_lib/init.lua",
@@ -14,9 +12,11 @@ shared_scripts {
   "main.lua"
 }
 
+client_script "client/*.lua"
+
 server_scripts {
   "@oxmysql/lib/MySQL.lua",
-  "server.lua"
+  "server/*.lua"
 }
 
 ui_page "web/index.html"
