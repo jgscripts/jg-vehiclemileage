@@ -85,3 +85,11 @@ function sendToNui(data)
 end
 
 exports("GetUnit", function() return Config.Unit end)
+
+exports("GetMileage", function()
+  if currentVehPlate and currentVehPlate ~= "" and currentVehMileage then
+    return currentVehMileage, Config.Unit
+  else
+    return false
+  end
+end)
