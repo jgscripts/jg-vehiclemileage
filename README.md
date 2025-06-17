@@ -1,6 +1,6 @@
-# JG Scripts Vehicle Mileage (QB/QBox/ESX)
+# JG Scripts Vehicle Mileage v2 (QB/QBox/ESX/Custom)
 
-<img src="https://github.com/jgscripts/jg-vehiclemileage/assets/3826279/a774d098-05ae-4d05-b167-f4c990d1f0b8" alt="vehicle-mileage" style="width:200px;"/>
+<img src="https://github.com/user-attachments/assets/55065901-7859-4de3-bc75-1330d41128cb" alt="vehicle-mileage" style="width:200px;"/>
 
 A simple script for QBCore, QBox & ESX to show your vehicle's mileage in-game. When driving a vehicle that is owned (stored in the database), you will see an odometer in the bottom right of your screen. You can configure it to use miles or kilometers.
 
