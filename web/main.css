@@ -16,19 +16,22 @@ body {
   margin: 2rem;
   align-items: center;
   position: absolute;
-  background: #212529;
+  background: #000;
   border: 1px solid #42484e;
-  padding: 5px 8px;
-  border-radius: 7px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
   color: white;
   transition: 0.5s ease-in-out;
   user-select: none;
 }
 
 .odometer-value {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .odometer-unit {
   color: #999;
+  font-size: 12px;
+  font-weight: 600;
 }
