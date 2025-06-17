@@ -61,7 +61,6 @@ local function distanceCheck()
   currentMileage = currentMileage + distKm
   lastLocation = GetEntityCoords(cache.vehicle)
   local roundedMileage = tonumber(string.format("%.1f", currentMileage))
-  print(roundedMileage)
 
   sendToNui({
     type = "show",
@@ -108,7 +107,6 @@ lib.onCache("vehicle", function(vehicle)
   local prevVehicle = cache.vehicle
   
   if not vehicle and prevVehicle and currentMileage then
-    print("updating db!!")
     TriggerServerEvent("jg-vehiclemileage:server:update-mileage", getVehiclePlate(prevVehicle), currentMileage)
     return
   end
