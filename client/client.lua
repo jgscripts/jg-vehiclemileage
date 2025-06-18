@@ -16,7 +16,12 @@ local function sendToNui(data)
 end
 
 local function getVehiclePlate(vehicle)
-  return string.gsub(GetVehicleNumberPlateText(vehicle), "^%s*(.-)%s*$", "%1")
+    if not vehicle or not DoesEntityExist(vehicle) then return nil end
+
+    local plate = GetVehicleNumberPlateText(vehicle)
+    if not plate then return nil end
+
+    return string.gsub(plate, "^%s*(.-)%s*$", "%1")
 end
 
 local function distanceCheck()
