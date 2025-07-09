@@ -16,12 +16,12 @@ local function sendToNui(data)
 end
 
 local function getVehiclePlate(vehicle)
-    if not vehicle or not DoesEntityExist(vehicle) then return nil end
+  if not vehicle or not DoesEntityExist(vehicle) then return false end
 
-    local plate = GetVehicleNumberPlateText(vehicle)
-    if not plate then return nil end
+  local plate = GetVehicleNumberPlateText(vehicle)
+  if not plate then return false end
 
-    return string.gsub(plate, "^%s*(.-)%s*$", "%1")
+  return string.gsub(plate, "^%s*(.-)%s*$", "%1")
 end
 
 local function distanceCheck()
@@ -42,6 +42,7 @@ local function distanceCheck()
   end
 
   local plate = getVehiclePlate(cache.vehicle)
+  if not plate then return false end
 
   if not fetchedExistingMileage then
     currentMileage = Entity(cache.vehicle).state.vehicleMileage
