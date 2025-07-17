@@ -14,7 +14,7 @@ end)
 lib.cron.new(Config.DatabaseUpdateInterval, function()
     local count = 0
     for plate, mileage in pairs(vehicleMileage) do
-        if vehicleMileage_orginal[plate] ~= mileage then
+        if vehicleMileage_orginal[plate] and vehicleMileage_orginal[plate] ~= mileage then
             MySQL.update("UPDATE " .. Framework.VehiclesTable .. " SET mileage = @mileage WHERE plate = @plate", {
                 ["@mileage"] = mileage,
                 ["@plate"] = plate
@@ -25,6 +25,11 @@ lib.cron.new(Config.DatabaseUpdateInterval, function()
 
             if count % 10 == 0 then
                 Wait(500)
+            end
+                
+            elseif not vehicleMileage_orginal[plate] then
+                vehicleMileage_orginal[plate] = mileage
+            -- insert
             end
         end
     end
