@@ -48,10 +48,9 @@ local function distanceCheck()
     currentMileage = Entity(cache.vehicle).state.vehicleMileage
 
     if not currentMileage then
-      local data = lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
-      if data.error then return false end
-
-      currentMileage = data.mileage
+      local mileage = lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
+      if not mileage then return false end
+      currentMileage = mileage
     end
     
     fetchedExistingMileage = true
@@ -125,4 +124,34 @@ CreateThread(function()
   if cache.vehicle then startVehicleThread() end
 end)
 
-exports("GetUnit", function() return Config.Unit end)
+--------------------
+-- CLIENT EXPORTS --
+--------------------
+
+---@return number|false mileageKm
+exports("getMileage", function()
+  if not cache.vehicle then return false end
+
+  return Entity(cache.vehicle).state?.vehicleMileage or 0
+end)
+
+---@param ent integer
+---@return number|false mileageKm
+exports("getMileageByEntity", function(ent)
+  if not ent or ent == 0 then return false end
+  if not DoesEntityExist(ent) or not IsEntityAVehicle(ent) then return false end
+
+  return Entity(ent).state?.vehicleMileage or 0
+end)
+
+---@param plate string
+---@return number|false mileageKm
+exports("getMileageByPlate", function(plate)
+  if not plate or plate == "" then return false end
+
+  return lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
+end)
+
+---@return "miles"|"kilometers"
+exports("getUnit", function() return Config.Unit end)
+exports("GetUnit", function() return Config.Unit end) --!! DEPRECATED alias of getUnit
