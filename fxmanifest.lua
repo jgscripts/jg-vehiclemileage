@@ -4,7 +4,7 @@ lua54 "yes"
 
 author "JG Scripts"
 description "Tracks vehicle mileage with UI"
-version "v2.0.1"
+version "v2.1.0"
 
 shared_scripts {
   "@ox_lib/init.lua",
