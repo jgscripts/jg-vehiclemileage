@@ -6,9 +6,7 @@ A simple script for QBCore, QBox & ESX to show your vehicle's mileage in-game. W
 
 ## Installation
 
-1. Download the zip, and move into your resources folder
-2. Ensure the script in your server.cfg, by adding `ensure jg-vehiclemileage`. Make sure the script is ensured _after_ your `qb-core`, `qbx_core` or `es_extended` resource
-3. Run either the QBCore/QBox or ESX line of SQL in `run.sql` within your database
+You can find our full installation guide here: https://docs.jgscripts.com/vehicle-mileage/installation
 
 ## Dependencies
 
@@ -18,41 +16,13 @@ A simple script for QBCore, QBox & ESX to show your vehicle's mileage in-game. W
 
 ## Custom Framework
 
-Using a custom framework is fairly straightforward. All your framework needs to have is some sort of owned vehicles database table, and that table needs to have a `plate` column in it. Then all you need to do is:
-
-1. Go to `main.lua`
-2. Add another conditional for your framework, and point to the name of your vehicles table
-3. In `config.lua`, set `Config.Framework = [your framework name]`
-
-Example:
-
-```
-if Config.Framework == "QBCore" then
-  Framework.VehiclesTable = "player_vehicles"
-elseif Config.Framework == "ESX" then
-  Framework.VehiclesTable = "owned_vehicles"
-elseif Config.Framework == "MyFrameworkName" then
-  Framework.VehiclesTable = "vehicles_table_name"
-else
-  error("You haven't set a valid framework. Valid options can be found in main.lua!")
-end
-```
+If you not using QBCore, Qbox or ESX and are instead running a different framework, a custom one, or no framework at all, JG Vehicle Mileage is pretty straightforward to adapt. We have written a guide in our docs: https://docs.jgscripts.com/vehicle-mileage/custom-framework
 
 ## Exports
 
-Use `GetMileage(plate)` to get the mileage of a vehicle. Returns
-
-```lua
-local distance, unit = exports["jg-vehiclemileage"]:GetMileage("PLATE")
-```
-
-Returns:
-
-- **distance**: number
-- **unit**: enum `"miles", "kilometers"`
-
-_Will return `false` if the plate does not exist in the database_
+- Client exports: https://docs.jgscripts.com/vehicle-mileage/exports/client-exports
+- Server exports: https://docs.jgscripts.com/vehicle-mileage/exports/server-exports
 
 ## Our other work
 
-Want to see your vehicle's mileage in your garage with no setup? Try our Advanced Garages script: https://jgscripts.com/scripts/advanced-garages
+JG Scripts makes the #1 most popular vehicle scripts for FiveM. You can see our entire collection here: https://jgscripts.com/scripts
