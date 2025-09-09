@@ -43,5 +43,5 @@ exports("getUnit", function() return Config.Unit end)
 exports("GetMileage", function(plate)
   local vehicle = MySQL.single.await("SELECT mileage FROM " .. Framework.VehiclesTable .. " WHERE plate = ?", {plate})
   if not vehicle then return false end
-  return vehicle.vehicleMileage, Config.Unit
+  return vehicle.mileage, Config.Unit
 end)
