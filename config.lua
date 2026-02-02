@@ -1,7 +1,20 @@
 Config = {}
+
 Config.AutoRunSQL = true
 
-Config.Framework = "auto" -- or "QBCore", "Qbox", "ESX"
+---@type "auto" | "QBCore" | "Qbox" | "ESX"
+Config.Framework = "auto"
+
+-- This setting will not work if you are using jg-hud or tgiann-lumihud.
 Config.ShowMileage = true
-Config.Unit = "miles" -- "miles" or "kilometers"
-Config.Position = "bottom-right" -- "bottom-right" or "bottom-left" or "top-right" or "top-left" or "bottom-center" or "top-center"
+
+---@type "miles" | "kilometers"
+Config.Unit = "miles"
+
+---@type "bottom-right" | "bottom-left" | "top-right" | "top-left" | "bottom-center" | "top-center"
+Config.Position = "bottom-right"
+
+Config.ScriptCompatibility = {
+    ["tgiann-lumihud"] = false, -- If you set this to true, you must also set the config.customMileageSystem setting to true in the tgiann-lumihud script.
+    ["jg-hud"] = GetResourceState("jg-hud") == "started"
+}

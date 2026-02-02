@@ -4,15 +4,28 @@ local fetchedExistingMileage = false
 local lastUpdatedMileage = nil
 local serverUpdateMileageThreshold, lastUpdatedMileageServer = 3, nil
 
-local function sendToNui(data)
-  if GetResourceState("jg-hud") == "started" then
-    SendNUIMessage({ type = "hide" })
-    return
+local function canShowMenu()
+  if not Config.ShowMileage then
+    return false
   end
 
-  if Config.ShowMileage then
-    SendNUIMessage(data)
+  if Config.ScriptCompatibility["tgiann-lumihud"] then
+    return false
   end
+
+  if Config.ScriptCompatibility["jg-hud"] then
+    return false
+  end
+
+  return true
+end
+
+local function sendToNui(data)
+  if not canShowMenu() then
+    return SendNUIMessage({ type = "hide" })
+  end
+
+  SendNUIMessage(data)
 end
 
 local function getVehiclePlate(vehicle)
@@ -22,6 +35,18 @@ local function getVehiclePlate(vehicle)
   if not plate then return false end
 
   return string.gsub(plate, "^%s*(.-)%s*$", "%1")
+end
+
+local function updateVehicleMileage(vehicle, plate, mileage, updateServer)
+  if Config.ScriptCompatibility["tgiann-lumihud"] then
+    exports["tgiann-lumihud"]:UpdateTotalKm(mileage)
+  end
+
+  Entity(vehicle).state:set("vehicleMileage", mileage, true)
+
+  if updateServer then
+    TriggerServerEvent("jg-vehiclemileage:server:update-mileage", plate, mileage)
+  end
 end
 
 local function distanceCheck()
@@ -52,7 +77,7 @@ local function distanceCheck()
       if not mileage then return false end
       currentMileage = mileage
     end
-    
+
     fetchedExistingMileage = true
     return true
   end
@@ -75,13 +100,12 @@ local function distanceCheck()
   })
 
   if roundedMileage ~= lastUpdatedMileage then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
+    updateVehicleMileage(cache.vehicle, plate, roundedMileage, false)
     lastUpdatedMileage = roundedMileage
   end
 
   if not lastUpdatedMileageServer or math.abs(roundedMileage - lastUpdatedMileageServer) >= serverUpdateMileageThreshold then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
-    TriggerServerEvent("jg-vehiclemileage:server:update-mileage", plate, roundedMileage)
+    updateVehicleMileage(cache.vehicle, plate, roundedMileage, true)
     lastUpdatedMileageServer = roundedMileage
   end
 
@@ -110,7 +134,7 @@ end
 
 lib.onCache("vehicle", function(vehicle)
   local prevVehicle = cache.vehicle
-  
+
   if not vehicle and prevVehicle and currentMileage then
     TriggerServerEvent("jg-vehiclemileage:server:update-mileage", getVehiclePlate(prevVehicle), currentMileage)
     return

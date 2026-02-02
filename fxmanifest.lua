@@ -4,7 +4,7 @@ lua54 "yes"
 
 author "JG Scripts"
 description "Tracks vehicle mileage with UI"
-version "v2.1.1"
+version "v2.2.0"
 
 shared_scripts {
   "@ox_lib/init.lua",
@@ -21,6 +21,6 @@ server_scripts {
 
 ui_page "web/index.html"
 
-files {"web/*"}
+files { "web/*" }
 
-escrow_ignore {"**/*"}
+escrow_ignore { "**/*" }
