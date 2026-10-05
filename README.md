@@ -8,7 +8,15 @@ A simple script for QBCore, QBox & ESX to show your vehicle's mileage in-game. W
 
 You can find our full installation guide here: https://docs.jgscripts.com/vehicle-mileage/installation
 
+## Strict statebag mode
+
+Mileage is calculated on the server from the current driver's vehicle positions. The client reports whether it is driving on the ground, but cannot set a mileage total or choose a plate to update. This supports `setr sv_stateBagStrictMode true` without disabling the security control.
+
+All existing mileage exports continue to return kilometres. `Config.Unit` controls the display unit. When updating alongside JG Mechanic, update both resources; older Mechanic versions may still write other statebags from the client.
+
 ## Dependencies
+
+- OneSync
 
 - QBCore/QBox/ESX (or pretty easy to use a custom framework)
 - [ox_lib](https://github.com/overextended/ox_lib)

@@ -2,6 +2,8 @@ fx_version "cerulean"
 game "gta5"
 lua54 "yes"
 
+dependency "/onesync"
+
 author "JG Scripts"
 description "Tracks vehicle mileage with UI"
 version "v2.1.1"

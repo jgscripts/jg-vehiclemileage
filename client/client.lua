@@ -1,127 +1,55 @@
-local lastLocation = nil
-local currentMileage = 0
-local fetchedExistingMileage = false
-local lastUpdatedMileage = nil
-local serverUpdateMileageThreshold, lastUpdatedMileageServer = 3, nil
+--[[
+  Description:
+    Mileage display and grounded-driving observations. All shared state is server-owned.
+  Exports:
+    getMileage, getMileageByEntity, getMileageByPlate, getUnit, GetUnit
+]]--
+local generation = 0
 
 local function sendToNui(data)
   if GetResourceState("jg-hud") == "started" then
-    SendNUIMessage({ type = "hide" })
+    SendNUIMessage({type = "hide"})
     return
   end
-
-  if Config.ShowMileage then
-    SendNUIMessage(data)
-  end
+  if Config.ShowMileage then SendNUIMessage(data) end
 end
 
-local function getVehiclePlate(vehicle)
-  if not vehicle or not DoesEntityExist(vehicle) then return false end
-
-  local plate = GetVehicleNumberPlateText(vehicle)
-  if not plate then return false end
-
-  return string.gsub(plate, "^%s*(.-)%s*$", "%1")
-end
-
-local function distanceCheck()
-  if not cache.vehicle then
-    sendToNui({ type = "hide" })
-    return false
-  end
-
-  local vehClass = GetVehicleClass(cache.vehicle)
-
-  if cache.seat ~= -1 or vehClass == 13 or vehClass == 14 or vehClass == 15 or vehClass == 16 or vehClass == 17 or vehClass == 21 then
-    sendToNui({ type = "hide" })
-    return false
-  end
-
-  if not lastLocation then
-    lastLocation = GetEntityCoords(cache.vehicle)
-  end
-
-  local plate = getVehiclePlate(cache.vehicle)
-  if not plate then return false end
-
-  if not fetchedExistingMileage then
-    currentMileage = Entity(cache.vehicle).state.vehicleMileage
-
-    if not currentMileage then
-      local mileage = lib.callback.await("jg-vehiclemileage:server:get-mileage", false, plate)
-      if not mileage then return false end
-      currentMileage = mileage
-    end
-    
-    fetchedExistingMileage = true
-    return true
-  end
-
-  local dist = 0
-  if IsVehicleOnAllWheels(cache.vehicle) and not IsEntityInWater(cache.vehicle) then
-    dist = #(lastLocation - GetEntityCoords(cache.vehicle))
-  end
-
-  local distKm = dist / 1000
-  currentMileage = currentMileage + distKm
-  lastLocation = GetEntityCoords(cache.vehicle)
-  local roundedMileage = tonumber(string.format("%.1f", currentMileage))
-
-  sendToNui({
-    type = "show",
-    value = roundedMileage,
-    unit = Config.Unit,
-    position = Config.Position
-  })
-
-  if roundedMileage ~= lastUpdatedMileage then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
-    lastUpdatedMileage = roundedMileage
-  end
-
-  if not lastUpdatedMileageServer or math.abs(roundedMileage - lastUpdatedMileageServer) >= serverUpdateMileageThreshold then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
-    TriggerServerEvent("jg-vehiclemileage:server:update-mileage", plate, roundedMileage)
-    lastUpdatedMileageServer = roundedMileage
-  end
-
-  return true
-end
-
-local vehicleThreadStarted = false
-local function startVehicleThread()
-  if vehicleThreadStarted then return end
-  vehicleThreadStarted = true
-
+local function startSampling()
+  generation = generation + 1
+  local current = generation
+  TriggerServerEvent("jg-vehiclemileage:server:stop-sampling")
   CreateThread(function()
-    while cache.vehicle do
-      Wait(1000)
-
-      if not distanceCheck() then
-        break
-      end
+    -- ox_lib updates cache after invoking cache listeners.
+    Wait(0)
+    local vehicle = cache.vehicle
+    if not vehicle or cache.seat ~= -1 then sendToNui({type = "hide"}) return end
+    local class = GetVehicleClass(vehicle)
+    if class == 13 or class == 14 or class == 15 or class == 16 or class == 17 or class == 21 then
+      sendToNui({type = "hide"})
+      return
     end
-
-    vehicleThreadStarted = false
-    fetchedExistingMileage = false
-    lastUpdatedMileage = nil
+    while current == generation and cache.vehicle == vehicle and cache.seat == -1 do
+      local mileage = lib.callback.await("jg-vehiclemileage:server:sample", false, VehToNet(vehicle), IsVehicleOnAllWheels(vehicle) and not IsEntityInWater(vehicle))
+      if current ~= generation then return end
+      if type(mileage) == "number" then
+        sendToNui({type = "show", value = mileage, unit = Config.Unit, position = Config.Position})
+      end
+      Wait(1000)
+    end
+    if current == generation then
+      TriggerServerEvent("jg-vehiclemileage:server:stop-sampling")
+      sendToNui({type = "hide"})
+    end
   end)
 end
 
-lib.onCache("vehicle", function(vehicle)
-  local prevVehicle = cache.vehicle
-  
-  if not vehicle and prevVehicle and currentMileage then
-    TriggerServerEvent("jg-vehiclemileage:server:update-mileage", getVehiclePlate(prevVehicle), currentMileage)
-    return
-  end
-
-  startVehicleThread()
-end)
-
--- Handle restarts when ped is already in vehicle
-CreateThread(function()
-  if cache.vehicle then startVehicleThread() end
+lib.onCache("vehicle", startSampling)
+lib.onCache("seat", startSampling)
+CreateThread(function() if cache.vehicle then startSampling() end end)
+AddEventHandler("onResourceStop", function(resource)
+  if resource ~= GetCurrentResourceName() then return end
+  generation = generation + 1
+  TriggerServerEvent("jg-vehiclemileage:server:stop-sampling")
 end)
 
 --------------------
