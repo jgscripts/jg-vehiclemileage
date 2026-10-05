@@ -75,12 +75,11 @@ local function distanceCheck()
   })
 
   if roundedMileage ~= lastUpdatedMileage then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
+    TriggerServerEvent("jg-vehiclemileage:server:sync-mileage", VehToNet(cache.vehicle), roundedMileage)
     lastUpdatedMileage = roundedMileage
   end
 
   if not lastUpdatedMileageServer or math.abs(roundedMileage - lastUpdatedMileageServer) >= serverUpdateMileageThreshold then
-    Entity(cache.vehicle).state:set("vehicleMileage", roundedMileage, true)
     TriggerServerEvent("jg-vehiclemileage:server:update-mileage", plate, roundedMileage)
     lastUpdatedMileageServer = roundedMileage
   end

@@ -14,6 +14,18 @@ RegisterNetEvent("jg-vehiclemileage:server:update-mileage", function(plate, mile
   MySQL.update("UPDATE " .. Framework.VehiclesTable .. " SET mileage = ? WHERE plate = ?", {mileage, plate})
 end)
 
+RegisterNetEvent("jg-vehiclemileage:server:sync-mileage", function(netId, mileage)
+  if type(netId) ~= "number" or netId % 1 ~= 0 then return end
+  if type(mileage) ~= "number" or mileage < 0 or mileage ~= mileage or mileage == math.huge then return end
+
+  local vehicle = NetworkGetEntityFromNetworkId(netId)
+  if vehicle == 0 or not DoesEntityExist(vehicle) or GetEntityType(vehicle) ~= 2 then return end
+
+  local ped = GetPlayerPed(source)
+  if ped == 0 or GetPedInVehicleSeat(vehicle, -1) ~= ped then return end
+  Entity(vehicle).state:set("vehicleMileage", mileage, true)
+end)
+
 --------------------
 -- SERVER EXPORTS --
 --------------------
