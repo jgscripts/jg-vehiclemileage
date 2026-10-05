@@ -75,7 +75,7 @@ lib.callback.register("jg-vehiclemileage:server:sample", function(src, netId, gr
   if record.src == src and record.time and grounded and record.grounded then
     local elapsed = (now - record.time) / 1000
     local distance = #(coords - record.coords)
-    local speed = math.max(0, math.min(400, GetEntitySpeed(vehicle)))
+    local speed = math.max(0, math.min(400, math.max(GetEntitySpeed(vehicle), record.speed or 0)))
     if elapsed > 0 and elapsed <= 5 and distance <= math.max(25, speed * elapsed * 2 + 10) and distance <= 400 * elapsed then
       record.mileage = record.mileage + distance / 1000
     end
@@ -88,6 +88,7 @@ lib.callback.register("jg-vehiclemileage:server:sample", function(src, netId, gr
   end
   if record.src and record.src ~= src and drivers[record.src] == vehicle then drivers[record.src] = nil end
   record.src, record.time, record.coords, record.grounded = src, now, coords, grounded
+  record.speed = GetEntitySpeed(vehicle)
   drivers[src] = vehicle
   local rounded = math.floor(record.mileage * 10 + 0.5) / 10
   if rounded ~= record.rounded then

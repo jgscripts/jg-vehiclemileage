@@ -119,6 +119,13 @@ equal(exported.getMileageByPlate("CHANGED"), 7.1)
 local km, unit = exported.GetMileage("CHANGED")
 equal(km, 7.1) equal(unit, "miles", "deprecated export still returns raw km")
 equal(exported.getMileageByEntity(999), false)
+-- A hard brake must retain real displacement from the preceding high-speed sample.
+vehicle(14, "BRAKING", 0)
+driver(4, 14)
+sample(4, 14, true)
+move(14, 50)
+vehicles[14].speed = 0
+equal(sample(4, 14, true), 0.1, "pre-braking speed bounds real displacement")
 -- Concurrent database restore must not create two samplers or apply a stale entity identity.
 vehicle(13, "LOADING", 4)
 driver(3, 13)
