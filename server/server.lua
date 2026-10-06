@@ -10,7 +10,23 @@ lib.callback.register("jg-vehiclemileage:server:get-mileage", function(_, plate)
 end)
 
 RegisterNetEvent("jg-vehiclemileage:server:update-mileage", function(plate, mileage)
-  if not plate or plate == "" then return end
+  -- only the current network owner of a spawned vehicle with this plate may
+  -- write its odometer, and only forwards (no client-side tampering, no rollback)
+  mileage = tonumber(mileage)
+  if not mileage or mileage < 0 or mileage > 10000000 then return end
+  local src = source
+  local ok = false
+  local vehicles = GetAllVehicles()
+  for i = 1, #vehicles do
+    local vehPlate = GetVehicleNumberPlateText(vehicles[i]):match("^%s*(.-)%s*$")
+    if vehPlate == plate then
+      if NetworkGetEntityOwner(vehicles[i]) == src then ok = true end
+      break
+    end
+  end
+  if not ok then return end
+  local current = MySQL.scalar.await("SELECT mileage FROM " .. Framework.VehiclesTable .. " WHERE plate = ?", {plate})
+  if current and mileage < current then return end
   MySQL.update("UPDATE " .. Framework.VehiclesTable .. " SET mileage = ? WHERE plate = ?", {mileage, plate})
 end)
 
